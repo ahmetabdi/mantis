@@ -1,4 +1,10 @@
 defmodule Mantis.MovieNight do
+  alias Mantis.Model.Movie
+
+  def name do
+    "MovieNight"
+  end
+
   def url do
     "http://movienight.ws"
   end
@@ -39,9 +45,8 @@ defmodule Mantis.MovieNight do
     movies_html = Floki.find(body, ".movie")
 
     for movie_html <- movies_html do
-      name = Floki.find(movie_html, "h2") |> Floki.text
       link = Floki.find(movie_html, "a") |> Floki.attribute("href")
-      IO.puts "Name: #{name} | link: #{link}"
+      process_movie(link)
     end
   end
 
@@ -49,9 +54,20 @@ defmodule Mantis.MovieNight do
     {:ok, body} = Mantis.get(movie_url)
 
     name = Floki.find(body, "#movie h1") |> Floki.text
-    iframe_url = Regex.run(~r/iframe\s+src="([^"]+)/, body) |> Enum.at(1)
+    iframe_url = grab_iframe(body)
     rating = Floki.find(body, "div.rank") |> Floki.text
 
-    IO.inspect {name, iframe_url, rating}
+    IO.puts "name #{name}, iframe_url #{iframe_url}, rating #{rating}"
+
+    %Movie{name: name, url: iframe_url, rating: rating}
+  end
+
+  defp grab_iframe(body) do
+    ~r/iframe\s+src="([^"]+)/
+    |> Regex.run(body)
+    |> case do
+      nil -> "No video available"
+      match -> match |> Enum.at(1)
+    end
   end
 end

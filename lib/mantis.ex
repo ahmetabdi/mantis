@@ -16,24 +16,4 @@ defmodule Mantis do
         IO.inspect reason
     end
   end
-
-  # defp process do
-  #   receive do
-  #     %HTTPoison.AsyncStatus{code: code} ->
-  #       inspect code
-  #       IO.puts "AsyncStatus: #{code}"
-  #     %HTTPoison.AsyncHeaders{headers: headers} ->
-  #       inspect headers
-  #       IO.puts "AsyncHeaders"
-  #     %HTTPoison.AsyncChunk{chunk: chunk} ->
-  #       inspect chunk
-  #       IO.puts "AsyncChunk"
-  #     %HTTPoison.AsyncEnd{} ->
-  #       IO.puts "AsyncEnd"
-  #     result ->
-  #       {:error, "Expected %HTTPoison.Async*, got [#{inspect result}]"}
-  #   after
-  #     5_000 -> {:error, "Expected %HTTPoison.AsyncStatus, got nothing after 5s"}
-  #   end
-  # end
 end

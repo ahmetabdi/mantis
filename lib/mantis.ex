@@ -7,7 +7,7 @@ defmodule Mantis do
   end
 
   def get(url) do
-    case HTTPoison.get(url) do
+    case HTTPoison.get(url, [], [hackney: [follow_redirect: true]]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}
       {:ok, %HTTPoison.Response{status_code: status_code}} ->

@@ -9,8 +9,22 @@ defmodule Mantis.MovieNight do
     "http://movienight.ws"
   end
 
+  def all do
+    for page_number <- 1..30 do
+      {status, body} = Mantis.get("#{url}/page/#{page_number}/")
+
+      IO.puts "#{url}/page/#{page_number}/"
+
+      body
+      |> Floki.find(".movie a")
+      |> Floki.attribute("href")
+      |> Enum.take(10)
+      |> Enum.map(fn(url) -> process_movie(url) end)
+    end
+  end
+
   def most_viewed do
-    {:ok, body} = Mantis.get(url)
+    {status, body} = Mantis.get(url)
 
     body
     |> Floki.find(".links a")
@@ -20,7 +34,7 @@ defmodule Mantis.MovieNight do
   end
 
   def recommended do
-    {:ok, body} = Mantis.get(url)
+    {status, body} = Mantis.get(url)
 
     body
     |> Floki.find(".random a")
@@ -30,7 +44,7 @@ defmodule Mantis.MovieNight do
   end
 
   def latest do
-    {:ok, body} = Mantis.get(url)
+    {status, body} = Mantis.get(url)
 
     body
     |> Floki.find(".movie a")
@@ -40,7 +54,7 @@ defmodule Mantis.MovieNight do
   end
 
   def search(query) do
-    {:ok, body} = Mantis.get("#{url}/?s=#{URI.encode(query)}")
+    {status, body} = Mantis.get("#{url}/?s=#{URI.encode(query)}")
 
     movies_html = Floki.find(body, ".movie")
 
@@ -51,13 +65,13 @@ defmodule Mantis.MovieNight do
   end
 
   defp process_movie(movie_url) do
-    {:ok, body} = Mantis.get(movie_url)
+    {status, body} = Mantis.get(movie_url)
 
     name = Floki.find(body, "#movie h1") |> Floki.text
     iframe_url = grab_iframe(body)
     rating = Floki.find(body, "div.rank") |> Floki.text
 
-    IO.puts "name #{name}, iframe_url #{iframe_url}, rating #{rating}"
+    # IO.puts "name #{name}, iframe_url #{iframe_url}, rating #{rating}"
 
     %Movie{name: name, url: iframe_url, rating: rating}
   end
